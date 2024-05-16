@@ -1,17 +1,15 @@
-// authController.ts
-import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import User, { UserDocument } from './User';
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('./User');
 
 const JWT_SECRET = '123456';
 
-export const login = async (req: Request, res: Response): Promise<void> => {
+const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     // Tìm người dùng trong cơ sở dữ liệu
-    const user: UserDocument | null = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (!user) {
       res.status(401).json({ message: 'Email hoặc mật khẩu không đúng.' });
@@ -19,7 +17,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // So sánh mật khẩu đã hash
-    const isPasswordValid: boolean = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       res.status(401).json({ message: 'Email hoặc mật khẩu không đúng.' });
@@ -27,7 +25,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Tạo mã thông báo JWT
-    const token: string = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
 
     // Trả về token
     res.status(200).json({ token });
@@ -36,10 +34,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
+const getAllUsers = async (req, res) => {
   try {
     // Lấy tất cả người dùng từ cơ sở dữ liệu
-    const users: UserDocument[] = await User.find();
+    const users = await User.find();
 
     // Trả về danh sách người dùng
     res.status(200).json(users);
@@ -48,12 +46,12 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-export const createUser = async (req: Request, res: Response): Promise<void> => {
+const createUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     // Kiểm tra xem người dùng đã tồn tại chưa
-    const existingUser: UserDocument | null = await User.findOne({ email });
+    const existingUser = await User.findOne({ email });
 
     if (existingUser) {
       res.status(400).json({ message: 'Email đã tồn tại.' });
@@ -61,10 +59,10 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     }
 
     // Hash mật khẩu trước khi lưu vào cơ sở dữ liệu
-    const hashedPassword: string = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Tạo người dùng mới
-    const newUser: UserDocument = new User({
+    const newUser = new User({
       email,
       password: hashedPassword,
     });
@@ -78,3 +76,8 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình tạo người dùng.' });
   }
 };
+export default {
+  login,
+  getAllUsers,
+  createUser
+}
