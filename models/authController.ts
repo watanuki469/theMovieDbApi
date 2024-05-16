@@ -1,15 +1,17 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const User = require('./User');
+// authController.ts
+import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import User, { UserDocument } from './User';
 
 const JWT_SECRET = '123456';
 
-const login = async (req, res) => {
+export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   try {
     // Tìm người dùng trong cơ sở dữ liệu
-    const user = await User.findOne({ email });
+    const user: UserDocument | null = await User.findOne({ email });
 
     if (!user) {
       res.status(401).json({ message: 'Email hoặc mật khẩu không đúng.' });
@@ -17,7 +19,7 @@ const login = async (req, res) => {
     }
 
     // So sánh mật khẩu đã hash
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid: boolean = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       res.status(401).json({ message: 'Email hoặc mật khẩu không đúng.' });
@@ -25,7 +27,7 @@ const login = async (req, res) => {
     }
 
     // Tạo mã thông báo JWT
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+    const token: string = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
 
     // Trả về token
     res.status(200).json({ token });
@@ -34,10 +36,10 @@ const login = async (req, res) => {
   }
 };
 
-const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     // Lấy tất cả người dùng từ cơ sở dữ liệu
-    const users = await User.find();
+    const users: UserDocument[] = await User.find();
 
     // Trả về danh sách người dùng
     res.status(200).json(users);
@@ -46,12 +48,12 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-const createUser = async (req, res) => {
+export const createUser = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   try {
     // Kiểm tra xem người dùng đã tồn tại chưa
-    const existingUser = await User.findOne({ email });
+    const existingUser: UserDocument | null = await User.findOne({ email });
 
     if (existingUser) {
       res.status(400).json({ message: 'Email đã tồn tại.' });
@@ -59,10 +61,10 @@ const createUser = async (req, res) => {
     }
 
     // Hash mật khẩu trước khi lưu vào cơ sở dữ liệu
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword: string = await bcrypt.hash(password, 10);
 
     // Tạo người dùng mới
-    const newUser = new User({
+    const newUser: UserDocument = new User({
       email,
       password: hashedPassword,
     });
@@ -76,8 +78,3 @@ const createUser = async (req, res) => {
     res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình tạo người dùng.' });
   }
 };
-export default {
-  login,
-  getAllUsers,
-  createUser
-}

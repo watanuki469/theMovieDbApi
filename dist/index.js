@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
@@ -14,7 +13,8 @@ const authController_1 = require("./models/authController");
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
 app.use((0, cors_1.default)());
-app.use(body_parser_1.default.json());
+app.use(express_1.default.json());
+app.use(express_1.default.urlencoded({ extended: false }));
 app.post('/api/v1/login', authController_1.login);
 app.get('/api/v1/users', authController_1.getAllUsers);
 app.post('/api/v1/register', authController_1.createUser);
