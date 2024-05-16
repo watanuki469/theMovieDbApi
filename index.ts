@@ -14,9 +14,9 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
-app.post('/login', login);
-app.get('/users', getAllUsers);
-app.post('/register', createUser);
+app.post('/api/v1/login', login);
+app.get('/api/v1/users', getAllUsers);
+app.post('/api/v1/register', createUser);
 
 const server = http.createServer(app);
 
