@@ -1,12 +1,12 @@
 import dotenv from 'dotenv';
-dotenv.config();
-
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import http from "http";
 import mongoose from 'mongoose';
 import { createUser, getAllUsers, login } from '../models/authController';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,7 +23,7 @@ app.post('/api/v1/register', createUser);
 const server = http.createServer(app);
 
 mongoose.connect('mongodb+srv://admin:vNyLVQug8B7quWE4@cluster0.3avkh2c.mongodb.net/theMovieDb').then(() => {
-    console.log('MongoDb Connected');
+    console.log('MongoDb2 Connected');
     server.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
     });
