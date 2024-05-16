@@ -1,14 +1,15 @@
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
-import Notes2 from './models/Notes2';
-import { createUser, getAllUsers, login } from './models/authController';
-import bodyParser from 'body-parser';
-import http from "http";
+dotenv.config();
 
-const express = require('express');
-const cors = require('cors');
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import express from 'express';
+import http from "http";
+import mongoose from 'mongoose';
+import { createUser, getAllUsers, login } from './models/authController';
+
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(bodyParser.json());
